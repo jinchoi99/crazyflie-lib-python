@@ -31,8 +31,9 @@ import cflib.crtp
 # Initiate the low level drivers
 cflib.crtp.init_drivers()
 
-print('Scanning interfaces for Crazyflies...')
-available = cflib.crtp.scan_interfaces()
-print('Crazyflies found:')
-for i in available:
-    print(i[0])
+for i in [0, 1, 2, 3, 4 ,5 ,6, 7, 8,9]:
+    print('Scanning interfaces for Crazyflies...')
+    available = cflib.crtp.scan_interfaces(0xE7E7E7E700 + i)
+    print('Crazyflies found:')
+    for i in available:
+        print(i[0])
