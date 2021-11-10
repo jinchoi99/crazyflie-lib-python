@@ -16,7 +16,8 @@ class BasicFlip:
     # Distance (m)
     DIST_UP = 0.3
     # Angle (deg)
-    DEG_PITCH = 360
+    DEG_PITCH = 10
+    # Pitch rate is set by default in the firmware: https://github.com/bitcraze/crazyflie-firmware/blob/master/src/modules/src/stabilizer.c
     # Velocity (m/s)
     VELOCITY_UP = 0.2
     VELOCITY_LAND = 0.07
