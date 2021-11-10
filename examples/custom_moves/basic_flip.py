@@ -1,6 +1,6 @@
 """
 Simple example that connects to the first Crazyflie found,
-moves it up, right, land
+moves it up, flip, land
 """
 import time
 import math
@@ -12,21 +12,17 @@ from cflib.crazyflie import Crazyflie
 from set_point_thread import SetPointThread
 
 
-class BasicRight:
+class BasicFlip:
     # Distance (m)
     DIST_UP = 0.3
-    DIST_RIGHT = 0.1
     # Velocity (m/s)
-    VELOCITY_GEN = 0.1
     VELOCITY_UP = 0.2
-    VELOCITY_RIGHT = 0.2
     VELOCITY_LAND = 0.07
     # Rotation Rate (deg/s)
-    ROT_RATE_RIGHT = 70
-    ROT_RATE_LEFT = 70
+    RATE_FLIP = 70
     # Time (sec)
     TIME_UP = 3
-    TIME_RIGHT = 3
+    TIME_FLIP = 3
     TIME_DISCONNECT = 1
 
     def __init__(self, link_uri):
@@ -39,7 +35,6 @@ class BasicRight:
         self._cf.open_link(link_uri)
         print("Connecting to %s" % link_uri)
         self.is_connected = True
-        self.default_height = self.DIST_UP
         self._is_flying = False
         self._thread = None
 
@@ -47,8 +42,13 @@ class BasicRight:
         """This callback is called form the Crazyflie API when a Crazyflie
         has been connected and the TOCs have been downloaded."""
         print("Connected to %s" % link_uri)
-        # Run basic_up movement function
-        self._basic_up_motors()
+        # take off
+        self.take_off()
+        # up
+        self._basic_up_motors(self.DIST_UP, self.VELOCITY_UP, self.TIME_UP)
+        # flip
+        self._basic_flip_motors(self.RATE_FLIP, self.TIME_FLIP)
+        # land
         self.land(self.VELOCITY_LAND)
         # Start a timer to disconnect in TIME_DISCONNECT seconds after running basic_up movement and landing
         t = Timer(self.TIME_DISCONNECT, self._cf.close_link)
@@ -68,17 +68,7 @@ class BasicRight:
         Crazyflie moves out of range)"""
         print("Connection to %s lost: %s" % (link_uri, msg))
 
-    def _basic_up_motors(self):
-        # take_off (height, velocity)
-        self.take_off(self.default_height)
-        print("start basic_up_motors!")
-        # runs for TIME_RUN seconds
-        time.sleep(self.TIME_UP)
-        print("end basic_up_motors!")
-        # disconnect right away without going back to _connected for landing
-        # self._cf.close_link()
-
-    def take_off(self, height=None, velocity=VELOCITY_UP):
+    def take_off(self):
         # Takes off, starts the motors, goes straight up and hovers.
         if self._is_flying:
             raise Exception('Already flying')
@@ -89,27 +79,38 @@ class BasicRight:
         self._thread = SetPointThread(self._cf)
         # thread.start() runs thread's run()
         self._thread.start()
-        if height is None:
-            height = self.default_height
-        self.up(height, velocity)
 
-    def up(self, distance_m, velocity=VELOCITY_UP):
-        self.move_distance(0.0, 0.0, distance_m, velocity)
+    def _basic_flip_motors(self, rate_flip, time_flip):
+        # TODO: Implement this part
+        print("start flip!")
+        # runs for TIME_UP seconds
+        time.sleep(time_flip)
+        print("end flip!")
 
-    def down(self, distance_m, velocity=VELOCITY_GEN):
-        self.move_distance(0.0, 0.0, -distance_m, velocity)
+    def _basic_up_motors(self, distance_up, velocity_up, time_up):
+        self.up(distance_up, velocity_up)
+        print("start up!")
+        # runs for TIME_UP seconds
+        time.sleep(time_up)
+        print("end up!")
 
-    def land(self, velocity=VELOCITY_LAND):
+    def up(self, distance_up, velocity_up):
+        self.move_distance(0.0, 0.0, distance_up, velocity_up)
+
+    def down(self, distance_down, velocity_down):
+        self.move_distance(0.0, 0.0, -distance_down, velocity_down)
+
+    def land(self, velocity_land):
         # Go straight down and turn off the motors.
         if self._is_flying:
-            self.down(self._thread.get_height(), velocity)
+            self.down(self._thread.get_height(), velocity_land)
             self._thread.stop()
             self._thread = None
             self._cf.commander.send_stop_setpoint()
             self._is_flying = False
 
     def move_distance(self, distance_x_m, distance_y_m, distance_z_m,
-                      velocity=VELOCITY_GEN):
+                      velocity_m):
         """
         Move in a straight line.
         positive X is forward
@@ -119,10 +120,10 @@ class BasicRight:
         distance = math.sqrt(distance_x_m * distance_x_m +
                              distance_y_m * distance_y_m +
                              distance_z_m * distance_z_m)
-        flight_time = distance / velocity
-        velocity_x = velocity * distance_x_m / distance
-        velocity_y = velocity * distance_y_m / distance
-        velocity_z = velocity * distance_z_m / distance
+        flight_time = distance / velocity_m
+        velocity_x = velocity_m * distance_x_m / distance
+        velocity_y = velocity_m * distance_y_m / distance
+        velocity_z = velocity_m * distance_z_m / distance
         self.start_linear_motion(velocity_x, velocity_y, velocity_z)
         time.sleep(flight_time)
         self.stop()
@@ -172,6 +173,6 @@ if __name__ == "__main__":
         print(i[0])
 
     if len(available) > 0:
-        le = BasicRight(available[0][0])
+        le = BasicFlip(available[0][0])
     else:
         print("No Crazyflies found, cannot run example")

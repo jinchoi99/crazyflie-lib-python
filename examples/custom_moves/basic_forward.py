@@ -1,6 +1,6 @@
 """
 Simple example that connects to the first Crazyflie found,
-moves it up by only thrust
+moves it up, forward, and land
 """
 import time
 import math
@@ -9,7 +9,7 @@ from threading import Timer
 import cflib
 import cflib.crtp  # noqa
 from cflib.crazyflie import Crazyflie
-from examples.custom_moves.set_point_thread import SetPointThread
+from set_point_thread import SetPointThread
 
 
 class BasicForward:
@@ -100,7 +100,7 @@ class BasicForward:
 
     def down(self, distance_m, velocity=VELOCITY_GEN):
         self.move_distance(0.0, 0.0, -distance_m, velocity)
-    
+
     def forward(self, distance_m, velocity=VELOCITY_FORWARD):
         self.move_distance(distance_m, 0.0, 0.0, velocity)
 

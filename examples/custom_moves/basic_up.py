@@ -1,6 +1,6 @@
 """
 Simple example that connects to the first Crazyflie found,
-moves it up by only thrust
+moves it up, land
 """
 import time
 import math
