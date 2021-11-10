@@ -55,18 +55,18 @@ class SetPointThread(Thread):
         while True:
             try:
                 event_hover_setpoint = self._queue_hover_setpoint.get(block=True, timeout=self.update_period)
-                event_setpoint = self._queue_setpoint.get(block=True, timeout=self.update_period)
+                # event_setpoint = self._queue_setpoint.get(block=True, timeout=self.update_period)
                 if event_hover_setpoint == self.TERMINATE_EVENT:
                     return
 
                 self._new_hover_setpoint(*event_hover_setpoint)
-                self._new_setpoint(*event_setpoint)
+                # self._new_setpoint(*event_setpoint)
             except Empty:
                 pass
 
             self._update_z_in_setpoint()
             self._cf.commander.send_hover_setpoint(*self._hover_setpoint)
-            self._cf.commander.send_setpoint(*self._setpoint)
+            # self._cf.commander.send_setpoint(*self._setpoint)
 
     def _new_hover_setpoint(self, velocity_x, velocity_y, velocity_z, rate_yaw):
         self._z_base = self._current_z()

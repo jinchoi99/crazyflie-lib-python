@@ -6,6 +6,8 @@ import time
 import math
 
 from threading import Timer
+from threading import Thread
+
 import cflib
 import cflib.crtp  # noqa
 from cflib.crazyflie import Crazyflie
@@ -36,12 +38,40 @@ class BasicUpCopy:
 
     def _connected(self, link_uri):
         print("Connected to %s" % link_uri)
+        # Thread(target=self._ramp_motors).start()
         # Run basic_up movement function
         self._basic_up_motors(self.DIST_UP, self.VELOCITY_UP)
-        # self.land(self.VELOCITY_LAND)
+        print("ramping")
+        Thread(target=self._ramp_motors).start()
+        time.sleep(self.TIME_UP)
+        print("land")
+        self.land(self.VELOCITY_LAND)
         # Start a timer to disconnect in TIME_DISCONNECT seconds after running basic_up movement and landing
         t = Timer(self.TIME_DISCONNECT, self._cf.close_link)
         t.start()
+
+    def _ramp_motors(self):
+        thrust_mult = 1
+        thrust_step = 500
+        thrust = 20000
+        pitch = 0
+        roll = 0
+        yawrate = 0
+
+        # Unlock startup thrust protection
+        self._cf.commander.send_setpoint(0, 0, 0, 0)
+
+        while thrust >= 20000:
+            self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
+            time.sleep(0.1)
+            if thrust >= 25000:
+                thrust_mult = -1
+            thrust += thrust_step * thrust_mult
+        self._cf.commander.send_setpoint(0, 0, 0, 0)
+        # Make sure that the last packet leaves before the link is closed
+        # since the message queue is not flushed before closing
+        time.sleep(0.1)
+        self._cf.close_link()
 
     def _disconnected(self, link_uri):
         print("Disconnected from %s" % link_uri)
