@@ -17,6 +17,7 @@ class SetPointThread(Thread):
         self._cf = cf
 
         self._hover_setpoint = [0.0, 0.0, 0.0, 0.0]
+        self._zdistance_setpoint = [0.0, 0.0, 0.0, 0.0]
 
         self._z_base = 0.0
         self._z_velocity = 0.0
@@ -30,9 +31,9 @@ class SetPointThread(Thread):
         self._queue.put(self.TERMINATE_EVENT)
         self.join()
 
-    def set_vel_setpoint(self, velocity_x, velocity_y, velocity_z, rate_yaw):
+    def set_vel_setpoint(self, velocity_x, velocity_y, velocity_z, rate_yaw, deg_roll, deg_pitch):
         """Set the velocity setpoint to use for the future motion"""
-        self._queue.put((velocity_x, velocity_y, velocity_z, rate_yaw))
+        self._queue.put((velocity_x, velocity_y, velocity_z, rate_yaw, deg_roll, deg_pitch))
 
     def get_height(self):
         """
@@ -55,13 +56,15 @@ class SetPointThread(Thread):
 
             self._update_z_in_setpoint()
             self._cf.commander.send_hover_setpoint(*self._hover_setpoint)
+            self._cf.commander.send_zdistance_setpoint(*self._zdistance_setpoint)
 
-    def _new_setpoint(self, velocity_x, velocity_y, velocity_z, rate_yaw):
+    def _new_setpoint(self, velocity_x, velocity_y, velocity_z, rate_yaw, deg_roll, deg_pitch):
         self._z_base = self._current_z()
         self._z_velocity = velocity_z
         self._z_base_time = time.time()
 
         self._hover_setpoint = [velocity_x, velocity_y, rate_yaw, self._z_base]
+        self._zdistance_setpoint = [deg_roll, deg_pitch, rate_yaw, self._z_base]
 
     def _update_z_in_setpoint(self):
         self._hover_setpoint[self.ABS_Z_INDEX] = self._current_z()

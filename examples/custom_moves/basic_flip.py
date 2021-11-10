@@ -14,9 +14,9 @@ from set_point_thread_copy import SetPointThread
 
 class BasicFlip:
     # Distance (m)
-    DIST_UP = 0.1
+    DIST_UP = 0.3
     # Angle (deg)
-    ANGLE_PITCH = 360
+    DEG_PITCH = 360
     # Velocity (m/s)
     VELOCITY_UP = 0.2
     VELOCITY_LAND = 0.07
@@ -24,7 +24,7 @@ class BasicFlip:
     RATE_PITCH = 70
     # Time (sec)
     TIME_UP = 3
-    TIME_PITCH = 2
+    TIME_PITCH = 5
     TIME_DISCONNECT = 1
 
     def __init__(self, link_uri):
@@ -49,7 +49,7 @@ class BasicFlip:
         # up
         self._basic_up_motors(self.DIST_UP, self.VELOCITY_UP, self.TIME_UP)
         # flip
-        self._basic_pitch_motors(self.ANGLE_PITCH, self.RATE_PITCH, self.TIME_PITCH)
+        self._basic_pitch_motors(self.DEG_PITCH, self.RATE_PITCH, self.TIME_PITCH)
         # land
         self.land(self.VELOCITY_LAND)
         # Start a timer to disconnect in TIME_DISCONNECT seconds after running basic_up movement and landing
@@ -82,18 +82,19 @@ class BasicFlip:
         # thread.start() runs thread's run()
         self._thread.start()
 
-    def _basic_pitch_motors(self, angle_pitch, rate_pitch, time_pitch):
-        self.start_pitch_forward(angle_pitch, rate_pitch)
+    def _basic_pitch_motors(self, deg_pitch, rate_pitch, time_pitch):
+        self.start_pitch_forward(deg_pitch)
         print("start pitch!")
         # runs for TIME_UP seconds
         time.sleep(time_pitch)
         print("end pitch!")
 
-    def start_pitch_forward(self, angle_pitch, rate_pitch):
-        self._set_vel_setpoint_pitch(rate_pitch)
+    def start_pitch_forward(self, deg_pitch):
+        self._set_vel_setpoint_pitch(deg_pitch)
 
-    def _set_vel_setpoint_pitch(self, rate_pitch):
-        self._thread.set_vel_setpoint_pitch()
+    def _set_vel_setpoint_pitch(self, deg_pitch):
+        self._thread.set_vel_setpoint(
+            0, 0, 0, 0, 0, deg_pitch)
 
     def _basic_up_motors(self, distance_up, velocity_up, time_up):
         self.up(distance_up, velocity_up)
@@ -109,9 +110,11 @@ class BasicFlip:
         self.move_distance(0.0, 0.0, -distance_down, velocity_down)
 
     def land(self, velocity_land):
+        print("landing!")
         # Go straight down and turn off the motors.
         if self._is_flying:
-            self.down(self._thread.get_height(), velocity_land)
+            # self.down(self._thread.get_height(), velocity_land)
+            self.down(self.DIST_UP, velocity_land)
             self._thread.stop()
             self._thread = None
             self._cf.commander.send_stop_setpoint()
@@ -161,7 +164,7 @@ class BasicFlip:
         if not self._is_flying:
             raise Exception('Can not move on the ground. Take off first!')
         self._thread.set_vel_setpoint(
-            velocity_x, velocity_y, velocity_z, rate_yaw)
+            velocity_x, velocity_y, velocity_z, rate_yaw, 0, 0)
 
     def _reset_position_estimator(self):
         self._cf.param.set_value('kalman.resetEstimation', '1')
