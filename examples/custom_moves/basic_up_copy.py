@@ -9,7 +9,7 @@ from threading import Timer
 import cflib
 import cflib.crtp  # noqa
 from cflib.crazyflie import Crazyflie
-from set_point_thread import SetPointThread
+from set_point_thread_copy import SetPointThread
 
 
 class BasicUpCopy:
@@ -38,7 +38,7 @@ class BasicUpCopy:
         print("Connected to %s" % link_uri)
         # Run basic_up movement function
         self._basic_up_motors(self.DIST_UP, self.VELOCITY_UP)
-        self.land(self.VELOCITY_LAND)
+        # self.land(self.VELOCITY_LAND)
         # Start a timer to disconnect in TIME_DISCONNECT seconds after running basic_up movement and landing
         t = Timer(self.TIME_DISCONNECT, self._cf.close_link)
         t.start()
@@ -119,7 +119,7 @@ class BasicUpCopy:
     def _set_vel_setpoint(self, velocity_x, velocity_y, velocity_z, rate_yaw):
         if not self._is_flying:
             raise Exception('Can not move on the ground. Take off first!')
-        self._thread.set_vel_setpoint(
+        self._thread.set_hover_setpoint(
             velocity_x, velocity_y, velocity_z, rate_yaw)
 
     def _reset_position_estimator(self):

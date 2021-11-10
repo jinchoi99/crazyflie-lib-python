@@ -3,6 +3,7 @@ from threading import Thread
 from queue import Empty
 from queue import Queue
 
+
 class SetPointThread(Thread):
     TERMINATE_EVENT = 'terminate'
     UPDATE_PERIOD = 0.2

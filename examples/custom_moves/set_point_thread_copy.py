@@ -13,11 +13,14 @@ class SetPointThread(Thread):
         Thread.__init__(self)
         self.update_period = update_period
 
-        self._queue = Queue()
+        self._queue_hover_setpoint = Queue()
+        self._queue_setpoint = Queue()
         self._cf = cf
 
+        # vx, vy, yawrate, zdistance
         self._hover_setpoint = [0.0, 0.0, 0.0, 0.0]
-        self._zdistance_setpoint = [0.0, 0.0, 0.0, 0.0]
+        # roll, pitch, yaw, thrust
+        self._setpoint = [0.0, 0.0, 0, 0]
 
         self._z_base = 0.0
         self._z_velocity = 0.0
@@ -28,12 +31,17 @@ class SetPointThread(Thread):
         Stop the thread and wait for it to terminate
         :return:
         """
-        self._queue.put(self.TERMINATE_EVENT)
+        self._queue_hover_setpoint.put(self.TERMINATE_EVENT)
+        self._queue_setpoint.put(self.TERMINATE_EVENT)
         self.join()
 
-    def set_vel_setpoint(self, velocity_x, velocity_y, velocity_z, rate_yaw, deg_roll, deg_pitch):
+    def set_setpoint(self, roll, pitch, yaw, thrust):
         """Set the velocity setpoint to use for the future motion"""
-        self._queue.put((velocity_x, velocity_y, velocity_z, rate_yaw, deg_roll, deg_pitch))
+        self._queue_setpoint.put((roll, pitch, yaw, thrust))
+
+    def set_hover_setpoint(self, velocity_x, velocity_y, velocity_z, rate_yaw):
+        """Set the velocity setpoint to use for the future motion"""
+        self._queue_hover_setpoint.put((velocity_x, velocity_y, velocity_z, rate_yaw))
 
     def get_height(self):
         """
@@ -46,25 +54,29 @@ class SetPointThread(Thread):
     def run(self):
         while True:
             try:
-                event = self._queue.get(block=True, timeout=self.update_period)
-                if event == self.TERMINATE_EVENT:
+                event_hover_setpoint = self._queue_hover_setpoint.get(block=True, timeout=self.update_period)
+                event_setpoint = self._queue_setpoint.get(block=True, timeout=self.update_period)
+                if event_hover_setpoint == self.TERMINATE_EVENT:
                     return
 
-                self._new_setpoint(*event)
+                self._new_hover_setpoint(*event_hover_setpoint)
+                self._new_setpoint(*event_setpoint)
             except Empty:
                 pass
 
             self._update_z_in_setpoint()
             self._cf.commander.send_hover_setpoint(*self._hover_setpoint)
-            self._cf.commander.send_zdistance_setpoint(*self._zdistance_setpoint)
+            self._cf.commander.send_setpoint(*self._setpoint)
 
-    def _new_setpoint(self, velocity_x, velocity_y, velocity_z, rate_yaw, deg_roll, deg_pitch):
+    def _new_hover_setpoint(self, velocity_x, velocity_y, velocity_z, rate_yaw):
         self._z_base = self._current_z()
         self._z_velocity = velocity_z
         self._z_base_time = time.time()
 
         self._hover_setpoint = [velocity_x, velocity_y, rate_yaw, self._z_base]
-        self._zdistance_setpoint = [deg_roll, deg_pitch, rate_yaw, self._z_base]
+
+    def _new_setpoint(self, roll, pitch, yaw, thrust):
+        self._setpoint = [roll, pitch, yaw, thrust]
 
     def _update_z_in_setpoint(self):
         self._hover_setpoint[self.ABS_Z_INDEX] = self._current_z()
