@@ -9,20 +9,22 @@ from threading import Timer
 import cflib
 import cflib.crtp  # noqa
 from cflib.crazyflie import Crazyflie
-from set_point_thread import SetPointThread
+from set_point_thread_copy import SetPointThread
 
 
 class BasicFlip:
     # Distance (m)
-    DIST_UP = 0.3
+    DIST_UP = 0.1
+    # Angle (deg)
+    ANGLE_PITCH = 360
     # Velocity (m/s)
     VELOCITY_UP = 0.2
     VELOCITY_LAND = 0.07
     # Rotation Rate (deg/s)
-    RATE_FLIP = 70
+    RATE_PITCH = 70
     # Time (sec)
     TIME_UP = 3
-    TIME_FLIP = 3
+    TIME_PITCH = 2
     TIME_DISCONNECT = 1
 
     def __init__(self, link_uri):
@@ -47,7 +49,7 @@ class BasicFlip:
         # up
         self._basic_up_motors(self.DIST_UP, self.VELOCITY_UP, self.TIME_UP)
         # flip
-        self._basic_flip_motors(self.RATE_FLIP, self.TIME_FLIP)
+        self._basic_pitch_motors(self.ANGLE_PITCH, self.RATE_PITCH, self.TIME_PITCH)
         # land
         self.land(self.VELOCITY_LAND)
         # Start a timer to disconnect in TIME_DISCONNECT seconds after running basic_up movement and landing
@@ -75,17 +77,23 @@ class BasicFlip:
         if not self._cf.is_connected():
             raise Exception('Crazyflie is not connected')
         self._is_flying = True
-        self._reset_position_estimator()
+        # self._reset_position_estimator()
         self._thread = SetPointThread(self._cf)
         # thread.start() runs thread's run()
         self._thread.start()
 
-    def _basic_flip_motors(self, rate_flip, time_flip):
-        # TODO: Implement this part
-        print("start flip!")
+    def _basic_pitch_motors(self, angle_pitch, rate_pitch, time_pitch):
+        self.start_pitch_forward(angle_pitch, rate_pitch)
+        print("start pitch!")
         # runs for TIME_UP seconds
-        time.sleep(time_flip)
-        print("end flip!")
+        time.sleep(time_pitch)
+        print("end pitch!")
+
+    def start_pitch_forward(self, angle_pitch, rate_pitch):
+        self._set_vel_setpoint_pitch(rate_pitch)
+
+    def _set_vel_setpoint_pitch(self, rate_pitch):
+        self._thread.set_vel_setpoint_pitch()
 
     def _basic_up_motors(self, distance_up, velocity_up, time_up):
         self.up(distance_up, velocity_up)

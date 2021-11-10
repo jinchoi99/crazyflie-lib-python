@@ -14,7 +14,7 @@ from set_point_thread import SetPointThread
 
 class BasicRight:
     # Distance (m)
-    DIST_UP = 0.3
+    DIST_UP = 0.1
     DIST_RIGHT = 0.1
     # Velocity (m/s)
     VELOCITY_GEN = 0.1
