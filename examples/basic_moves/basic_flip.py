@@ -41,8 +41,8 @@ class BasicFlip:
         print("Connected to %s" % link_uri)
         print("Start _basic_up_motors!")
         self._basic_up_motors(self.DIST_UP, self.VELOCITY_UP)
-        print("Start _ramp_motors!")
-        self._ramp_motors()
+        print("Start _flip_motors!")
+        self._flip_motors()
         print("Start land!")
         self.land(self.VELOCITY_LAND)
         print("Start disconnect!")
@@ -66,7 +66,7 @@ class BasicFlip:
     def _basic_up_motors(self, dist_up, vel_up):
         print("Start take_off!")
         self.take_off(dist_up, vel_up)
-        print("wait")
+        print("remain up")
         time.sleep(self.TIME_HOVER_UP)
 
     def take_off(self, dist_up, vel_up):
@@ -148,31 +148,29 @@ class BasicFlip:
         self._cf.param.set_value('kalman.resetEstimation', '0')
         time.sleep(2)
 
-    def _ramp_motors(self):
+    def _flip_motors(self):
         thrust_mult = 1
         thrust_step = 500
         thrust = 20000
         pitch = 0
         roll = 0
-        yawrate = 10000
+        yawrate = 0
 
         # Unlock startup thrust protection
         self._cf.commander.send_setpoint(0, 0, 0, 0)
-
-        self.stop()
-
+        # Big jump before flip
         while thrust >= 20000:
-            self.stop()
             self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
             time.sleep(0.1)
             if thrust >= 25000:
                 thrust_mult = -1
             thrust += thrust_step * thrust_mult
         self._cf.commander.send_setpoint(0, 0, 0, 0)
-        self.stop()
-        # Make sure that the last packet leaves before the link is closed
-        # since the message queue is not flushed before closing
         time.sleep(0.1)
+        thrust = 0
+        pitch = 1000
+        self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
+        time.sleep(0.5)
 
 
 if __name__ == "__main__":
