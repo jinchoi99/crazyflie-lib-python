@@ -42,7 +42,8 @@ class BasicUpCopy:
         # Run basic_up movement function
         self._basic_up_motors(self.DIST_UP, self.VELOCITY_UP)
         print("ramping")
-        Thread(target=self._ramp_motors).start()
+        # Thread(target=self._ramp_motors).start()
+        self._ramp_motors()
         time.sleep(self.TIME_UP)
         print("land")
         self.land(self.VELOCITY_LAND)
