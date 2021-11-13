@@ -1,6 +1,6 @@
 """
 Simple example that connects to the first Crazyflie found,
-moves it up, land
+moves it up, flip, down
 """
 import time
 import math
@@ -12,11 +12,11 @@ from cflib.crazyflie import Crazyflie
 from set_point_thread import SetPointThread
 
 
-class BasicUp:
+class BasicFlip:
     # Distance (m)
     DIST_UP = 0.3
     # Velocity (m/s)
-    VELOCITY_UP = 0.2
+    VELOCITY_UP = 0.19
     VELOCITY_LAND = 0.07
     # Time (sec)
     TIME_HOVER_UP = 2
@@ -41,6 +41,8 @@ class BasicUp:
         print("Connected to %s" % link_uri)
         print("Start _basic_up_motors!")
         self._basic_up_motors(self.DIST_UP, self.VELOCITY_UP)
+        print("Start _ramp_motors!")
+        self._ramp_motors()
         print("Start land!")
         self.land(self.VELOCITY_LAND)
         print("Start disconnect!")
@@ -87,7 +89,8 @@ class BasicUp:
 
     def land(self, vel_land):
         if self._is_flying:
-            self.down(self._thread.get_height(), vel_land)
+            # self.down(self._thread.get_height(), vel_land)
+            self.down(self.DIST_UP, vel_land)
             self._thread.stop()
             self._thread = None
             self._cf.commander.send_stop_setpoint()
@@ -145,6 +148,32 @@ class BasicUp:
         self._cf.param.set_value('kalman.resetEstimation', '0')
         time.sleep(2)
 
+    def _ramp_motors(self):
+        thrust_mult = 1
+        thrust_step = 500
+        thrust = 20000
+        pitch = 0
+        roll = 0
+        yawrate = 10000
+
+        # Unlock startup thrust protection
+        self._cf.commander.send_setpoint(0, 0, 0, 0)
+
+        self.stop()
+
+        while thrust >= 20000:
+            self.stop()
+            self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
+            time.sleep(0.1)
+            if thrust >= 25000:
+                thrust_mult = -1
+            thrust += thrust_step * thrust_mult
+        self._cf.commander.send_setpoint(0, 0, 0, 0)
+        self.stop()
+        # Make sure that the last packet leaves before the link is closed
+        # since the message queue is not flushed before closing
+        time.sleep(0.1)
+
 
 if __name__ == "__main__":
     # Initialize the low-level drivers (don't list the debug drivers)
@@ -157,6 +186,6 @@ if __name__ == "__main__":
         print(i[0])
 
     if len(available) > 0:
-        le = BasicUp(available[0][0])
+        le = BasicFlip(available[0][0])
     else:
         print("No Crazyflies found, cannot run example")
