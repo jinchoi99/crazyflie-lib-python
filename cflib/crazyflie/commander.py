@@ -74,7 +74,7 @@ class Commander():
 
         if self._x_mode:
             roll, pitch = 0.707 * (roll - pitch), 0.707 * (roll + pitch)
-
+        print(f'thrust: {thrust}')
         pk = CRTPPacket()
         pk.port = CRTPPort.COMMANDER
         pk.data = struct.pack('<fffH', roll, -pitch, yaw, thrust)
@@ -123,6 +123,7 @@ class Commander():
         vx and vy are in m/s
         yawrate is in degrees/s
         """
+        print(f'zdistance: {zdistance}')
         pk = CRTPPacket()
         pk.port = CRTPPort.COMMANDER_GENERIC
         pk.data = struct.pack('<Bffff', TYPE_HOVER,

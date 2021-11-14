@@ -12,7 +12,7 @@ from cflib.crazyflie import Crazyflie
 from set_point_thread import SetPointThread
 
 
-class BasicFlip:
+class BasicFlipThrust:
     # Distance (m)
     DIST_UP = 0.3
     # Velocity (m/s)
@@ -20,7 +20,7 @@ class BasicFlip:
     VELOCITY_LAND = 0.07
     # Time (sec)
     TIME_HOVER_UP = 2
-    TIME_DISCONNECT = 2
+    TIME_DISCONNECT = 1
 
     def __init__(self, link_uri):
         """ Initialize and run the motion with the specified link_uri """
@@ -40,12 +40,12 @@ class BasicFlip:
         has been connected and the TOCs have been downloaded."""
         print("Connected to %s" % link_uri)
         print("Start _basic_up_motors!")
-        self._basic_up_motors(self.DIST_UP, self.VELOCITY_UP)
-        print("Start _flip_motors!")
-        self._flip_motors()
+        self._basic_up_motors()
+        # print("Start _flip_motors!")
+        # self._flip_motors()
         # print("Start land!")
         # self.land(self.VELOCITY_LAND)
-        print("Start disconnect!")
+        # print("Start disconnect!")
         # t = Timer(self.TIME_DISCONNECT, self._cf.close_link)
         # t.start()
         self._cf.close_link()
@@ -64,13 +64,27 @@ class BasicFlip:
         Crazyflie moves out of range)"""
         print("Connection to %s lost: %s" % (link_uri, msg))
 
-    def _basic_up_motors(self, dist_up, vel_up):
-        print("Start take_off!")
-        self.take_off(dist_up, vel_up)
-        print("remain up")
-        time.sleep(self.TIME_HOVER_UP)
+    def _basic_up_motors(self):
+        # thrust: 0-65535
+        thrust = 40000
+        pitch = 0
+        roll = 0
+        yawrate = 0
+        self._cf.commander.send_setpoint(0, 0, 0, 0)
+        for x in range(5):
+            self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
+            time.sleep(0.1)
+        for x in range(50):
+            self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
+            if(thrust >= 37600):
+                thrust -= 200
+            time.sleep(0.1)
+        thrust = 0
+        for x in range(10):
+            self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
+            time.sleep(0.1)
 
-    def take_off(self, dist_up, vel_up):
+    def take_off(self):
         if self._is_flying:
             raise Exception('Already flying')
         if not self._cf.is_connected():
@@ -80,30 +94,18 @@ class BasicFlip:
         self._thread = SetPointThread(self._cf)
         # thread.start() runs thread's run()
         self._thread.start()
-        self.up(dist_up, vel_up)
-
-    def up(self, dist_up, vel_up):
-        self.move_distance(0.0, 0.0, dist_up, vel_up)
 
     def down(self, dist_down, vel_down):
         self.move_distance(0.0, 0.0, -1*dist_down, vel_down)
 
     def land(self, vel_land):
-        self.start_down(vel_land)
-        self._thread.stop()
-        self._thread = None
-        self._cf.commander.send_stop_setpoint()
-        self._is_flying = False
-
-    def start_down(self, velocity):
-        """
-        Start moving down. This function returns immediately.
-
-        :param velocity: The velocity of the motion (meters/second)
-        :return:
-        """
-        self.start_linear_motion(0.0, 0.0, -velocity)
-        time.sleep(1)
+        if self._is_flying:
+            self.down(self._thread.get_height(), vel_land)
+            # self.down(self.DIST_UP, vel_land)
+            self._thread.stop()
+            self._thread = None
+            self._cf.commander.send_stop_setpoint()
+            self._is_flying = False
 
     def move_distance(self, distance_x_m, distance_y_m, distance_z_m,
                       velocity_m):
@@ -158,19 +160,16 @@ class BasicFlip:
         time.sleep(2)
 
     def _flip_motors(self):
-        # 0 - 65535
-        thrust = 30000
+        thrust = 50000
         pitch = 0
         roll = 0
         yawrate = 0
         # Big jump before flip
-        self._cf.commander.send_setpoint(0, 0, 0, 0)
-        for x in range(100):
+        for x in range(10):
             self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
-            time.sleep(0.01)
-        # thrust = 2000
-        # self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
-        self._cf.commander.send_setpoint(0, 0, 0, 0)
+            time.sleep(0.1)
+        thrust = 2000
+        self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
 
 
 if __name__ == "__main__":
@@ -184,6 +183,6 @@ if __name__ == "__main__":
         print(i[0])
 
     if len(available) > 0:
-        le = BasicFlip(available[0][0])
+        le = BasicFlipThrust(available[0][0])
     else:
         print("No Crazyflies found, cannot run example")

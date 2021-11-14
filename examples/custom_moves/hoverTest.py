@@ -16,6 +16,7 @@ from cflib.crazyflie.log import LogConfig
 
 logging.basicConfig(level=logging.ERROR)
 
+
 class MotorRampExample:
     """Example that connects to a Crazyflie and ramps the motors up/down and
     the disconnects"""
@@ -32,11 +33,10 @@ class MotorRampExample:
 
         self._cf.open_link(link_uri)
 
-
         print('Connecting to %s' % link_uri)
         self.is_connected = True
 
-        # change the parameters0, 
+        # change the parameters0,
         self._param_check_list = []
         self._param_groups = []
 
@@ -97,7 +97,6 @@ class MotorRampExample:
         #                              '{:d}'.format(thv))
         # time.sleep(5)
 
-        
         # self._cf.param.set_value('motorPowerSet.enable',
         #                              '{:d}'.format(0))
         ###########################################################
@@ -121,6 +120,7 @@ class MotorRampExample:
     def _stab_log_data(self, timestamp, data, logconf):
         """Callback froma the log API when data arrives"""
         print('[%d][%s]: %s' % (timestamp, logconf.name, data), flush=True)
+
     def _connection_failed(self, link_uri, msg):
         """Callback when connection initial connection fails (i.e no Crazyflie
         at the specified address)"""
@@ -143,8 +143,8 @@ class MotorRampExample:
         pitch = 0
         roll = 0
         yawrate = 0
-        start_height = 0.1
-        target_height = 0.5 # the distance is not accurate, 1.2 => 1.5m
+        start_height = 0.3
+        target_height = 0.5  # the distance is not accurate, 1.2 => 1.5m
 
         # Unlock startup thrust protection
         # print('begin', flush=True)
@@ -181,10 +181,10 @@ class MotorRampExample:
         print("down")
         cnt = 0
         while cnt < 50:
-            self._cf.commander.send_hover_setpoint(0, 0, 0, (-target_height + start_height)*(cnt / 50.0) + target_height)
+            self._cf.commander.send_hover_setpoint(
+                0, 0, 0, (-target_height + start_height)*(cnt / 50.0) + target_height)
             cnt += 1
             time.sleep(0.05)
-
 
         # while thrust >= 1000 and thrust < 10000:
         #     self._cf.commander.send_setpoint(0, 0, 0, thrust)
