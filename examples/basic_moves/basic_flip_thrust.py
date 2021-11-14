@@ -13,14 +13,6 @@ from set_point_thread import SetPointThread
 
 
 class BasicFlipThrust:
-    # Distance (m)
-    DIST_UP = 0.3
-    # Velocity (m/s)
-    VELOCITY_UP = 0.2
-    VELOCITY_LAND = 0.07
-    # Time (sec)
-    TIME_HOVER_UP = 2
-    TIME_DISCONNECT = 1
 
     def __init__(self, link_uri):
         """ Initialize and run the motion with the specified link_uri """
@@ -39,15 +31,7 @@ class BasicFlipThrust:
         """This callback is called form the Crazyflie API when a Crazyflie
         has been connected and the TOCs have been downloaded."""
         print("Connected to %s" % link_uri)
-        print("Start _basic_up_motors!")
-        self._basic_up_motors()
-        # print("Start _flip_motors!")
-        # self._flip_motors()
-        # print("Start land!")
-        # self.land(self.VELOCITY_LAND)
-        # print("Start disconnect!")
-        # t = Timer(self.TIME_DISCONNECT, self._cf.close_link)
-        # t.start()
+        self._basic_flip_motors()
         self._cf.close_link()
 
     def _disconnected(self, link_uri):
@@ -64,7 +48,7 @@ class BasicFlipThrust:
         Crazyflie moves out of range)"""
         print("Connection to %s lost: %s" % (link_uri, msg))
 
-    def _basic_up_motors(self):
+    def _basic_flip_motors(self):
         # thrust: 0-65535
         thrust = 40000
         pitch = 0
@@ -76,107 +60,38 @@ class BasicFlipThrust:
             self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
             time.sleep(0.1)
         print("hovering!")
-        for x in range(50):
+        for x in range(10):
             self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
             if(thrust >= 37600):
                 thrust -= 200
             time.sleep(0.1)
-        self._basic_land_motors(thrust)
-
-    def _basic_land_motors(self, thrust):
-        print("landing!")
-        for x in range(50):
-            self._cf.commander.send_setpoint(0, 0, 0, thrust)
-            thrust -= 200
-            time.sleep(0.1)
-        self._cf.commander.send_setpoint(0, 0, 0, 0)
-
-    def take_off(self):
-        if self._is_flying:
-            raise Exception('Already flying')
-        if not self._cf.is_connected():
-            raise Exception('Crazyflie is not connected')
-        self._is_flying = True
-        self._reset_position_estimator()
-        self._thread = SetPointThread(self._cf)
-        # thread.start() runs thread's run()
-        self._thread.start()
-
-    def down(self, dist_down, vel_down):
-        self.move_distance(0.0, 0.0, -1*dist_down, vel_down)
-
-    def land(self, vel_land):
-        if self._is_flying:
-            self.down(self._thread.get_height(), vel_land)
-            # self.down(self.DIST_UP, vel_land)
-            self._thread.stop()
-            self._thread = None
-            self._cf.commander.send_stop_setpoint()
-            self._is_flying = False
-
-    def move_distance(self, distance_x_m, distance_y_m, distance_z_m,
-                      velocity_m):
-        """
-        Move in a straight line.
-        positive X is forward
-        positive Y is left
-        positive Z is up
-        """
-        distance = math.sqrt(distance_x_m * distance_x_m +
-                             distance_y_m * distance_y_m +
-                             distance_z_m * distance_z_m)
-        flight_time = distance / velocity_m
-        velocity_x = velocity_m * distance_x_m / distance
-        velocity_y = velocity_m * distance_y_m / distance
-        velocity_z = velocity_m * distance_z_m / distance
-        self.start_linear_motion(velocity_x, velocity_y, velocity_z)
-        time.sleep(flight_time)
-        self.stop()
-
-    def start_linear_motion(self, velocity_x_m, velocity_y_m, velocity_z_m, rate_yaw=0.0):
-        """
-        Start a linear motion with an optional yaw rate input. This function returns immediately.
-
-        positive X is forward
-        positive Y is left
-        positive Z is up
-
-        :param velocity_x_m: The velocity along the X-axis (meters/second)
-        :param velocity_y_m: The velocity along the Y-axis (meters/second)
-        :param velocity_z_m: The velocity along the Z-axis (meters/second)
-        :param rate_yaw: The angular rate (degrees/second)
-        :return:
-        """
-        self._set_vel_setpoint(
-            velocity_x_m, velocity_y_m, velocity_z_m, rate_yaw)
-
-    def stop(self):
-        # Stop any motion and hover.
-        self._set_vel_setpoint(0.0, 0.0, 0.0, 0.0)
-
-    def _set_vel_setpoint(self, velocity_x, velocity_y, velocity_z, rate_yaw):
-        if not self._is_flying:
-            raise Exception('Can not move on the ground. Take off first!')
-        self._thread.set_vel_setpoint(
-            velocity_x, velocity_y, velocity_z, rate_yaw)
-
-    def _reset_position_estimator(self):
-        self._cf.param.set_value('kalman.resetEstimation', '1')
-        time.sleep(0.1)
-        self._cf.param.set_value('kalman.resetEstimation', '0')
-        time.sleep(2)
-
-    def _flip_motors(self):
-        thrust = 50000
-        pitch = 0
-        roll = 0
-        yawrate = 0
-        # Big jump before flip
+        print("jump!")
+        thrust = 40000
         for x in range(10):
             self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
             time.sleep(0.1)
-        thrust = 2000
-        self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
+        print("pitching!")
+        self._basic_pitch_motors()
+        print("landing!")
+        self._basic_land_motors(thrust)
+
+    def _basic_land_motors(self, thrust):
+        for x in range(30):
+            self._cf.commander.send_setpoint(0, 0, 0, thrust)
+            thrust -= 500
+            time.sleep(0.1)
+        self._cf.commander.send_setpoint(0, 0, 0, 0)
+
+    def _basic_pitch_motors(self):
+        thrust = 1000
+        pitch = 0
+        roll = 0
+        yawrate = 1000
+        for x in range(1):
+            self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
+            time.sleep(0.2)
+        # pitch = 0
+        # self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
 
 
 if __name__ == "__main__":
