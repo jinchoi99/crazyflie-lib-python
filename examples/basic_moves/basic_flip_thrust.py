@@ -71,18 +71,25 @@ class BasicFlipThrust:
         roll = 0
         yawrate = 0
         self._cf.commander.send_setpoint(0, 0, 0, 0)
+        print("going up!")
         for x in range(5):
             self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
             time.sleep(0.1)
+        print("hovering!")
         for x in range(50):
             self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
             if(thrust >= 37600):
                 thrust -= 200
             time.sleep(0.1)
-        thrust = 0
-        for x in range(10):
-            self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
+        self._basic_land_motors(thrust)
+
+    def _basic_land_motors(self, thrust):
+        print("landing!")
+        for x in range(50):
+            self._cf.commander.send_setpoint(0, 0, 0, thrust)
+            thrust -= 200
             time.sleep(0.1)
+        self._cf.commander.send_setpoint(0, 0, 0, 0)
 
     def take_off(self):
         if self._is_flying:
