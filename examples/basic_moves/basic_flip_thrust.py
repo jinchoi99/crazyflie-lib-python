@@ -65,33 +65,35 @@ class BasicFlipThrust:
             if(thrust >= 37600):
                 thrust -= 200
             time.sleep(0.1)
-        print("jump!")
-        thrust = 40000
-        for x in range(10):
-            self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
-            time.sleep(0.1)
+        # print("jump!")
+        # thrust = 40000
+        # for x in range(10):
+        #     self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
+        #     time.sleep(0.1)
         print("pitching!")
-        self._basic_pitch_motors()
-        print("landing!")
-        self._basic_land_motors(thrust)
+        self._basic_pitch_motors(thrust)
 
-    def _basic_land_motors(self, thrust):
-        for x in range(30):
-            self._cf.commander.send_setpoint(0, 0, 0, thrust)
-            thrust -= 500
-            time.sleep(0.1)
-        self._cf.commander.send_setpoint(0, 0, 0, 0)
-
-    def _basic_pitch_motors(self):
-        thrust = 1000
+    def _basic_pitch_motors(self, thrust_m):
+        thrust = thrust_m
         pitch = 0
         roll = 0
         yawrate = 1000
         for x in range(1):
             self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
             time.sleep(0.2)
-        # pitch = 0
-        # self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
+        print("landing!")
+        self._basic_land_motors(thrust, yawrate)
+
+    def _basic_land_motors(self, thrust_m, yawrate_m):
+        thrust = thrust_m
+        roll = 0
+        pitch = 0
+        yawrate = 0
+        while(thrust > 20000):
+            self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
+            thrust -= 500
+            time.sleep(0.1)
+        self._cf.commander.send_setpoint(0, 0, 0, 0)
 
 
 if __name__ == "__main__":
