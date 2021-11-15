@@ -74,7 +74,7 @@ class Commander():
 
         if self._x_mode:
             roll, pitch = 0.707 * (roll - pitch), 0.707 * (roll + pitch)
-        print(f'thrust: {thrust}')
+        # print(f'thrust: {thrust}')
         pk = CRTPPacket()
         pk.port = CRTPPort.COMMANDER
         pk.data = struct.pack('<fffH', roll, -pitch, yaw, thrust)

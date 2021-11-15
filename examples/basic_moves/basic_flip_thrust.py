@@ -50,7 +50,7 @@ class BasicFlipThrust:
 
     def _basic_flip_motors(self):
         # thrust: 0-65535
-        thrust = 40000
+        thrust = 42000
         pitch = 0
         roll = 0
         yawrate = 0
@@ -65,30 +65,44 @@ class BasicFlipThrust:
             if(thrust >= 37600):
                 thrust -= 200
             time.sleep(0.1)
-        # print("jump!")
-        # thrust = 40000
-        # for x in range(10):
-        #     self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
-        #     time.sleep(0.1)
-        print("pitching!")
-        self._basic_pitch_motors(thrust)
+        # print("pitching!")
+        # self._basic_pitch_motors(thrust)
+        print("rolling!")
+        self._basic_roll_motors()
 
-    def _basic_pitch_motors(self, thrust_m):
-        thrust = thrust_m
-        pitch = 0
+    def _basic_pitch_motors(self):
+        # self._cf.commander.send_setpoint(0, 180, 0, 8000)
+        # time.sleep(0.01)
+        # self._cf.commander.send_setpoint(0, 180, 0, 1000)
+        # time.sleep(0.01)
         roll = 0
-        yawrate = 1000
+        pitch = 500
+        yawrate = 0
+        thrust = 0.17
         for x in range(1):
             self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
-            time.sleep(0.2)
+            time.sleep(0.01)
         print("landing!")
         self._basic_land_motors(thrust, yawrate)
 
-    def _basic_land_motors(self, thrust_m, yawrate_m):
-        thrust = thrust_m
+    def _basic_roll_motors(self):
+        # roll to 500, pitch to 0 and raw thrust input to something very low (I used 0.17).
+        # Now just hit the throttle to get upwards speed, hold the flip button shortly and watch it spin.
+        roll = 500
+        pitch = 0
+        yawrate = 0
+        thrust = 0.17
+        for x in range(1):
+            self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
+            time.sleep(0.01)
+        print("landing!")
+        self._basic_land_motors()
+
+    def _basic_land_motors(self):
         roll = 0
         pitch = 0
         yawrate = 0
+        thrust = 30000
         while(thrust > 20000):
             self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
             thrust -= 500

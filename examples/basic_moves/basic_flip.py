@@ -20,7 +20,6 @@ class BasicFlip:
     VELOCITY_LAND = 0.07
     # Time (sec)
     TIME_HOVER_UP = 2
-    TIME_DISCONNECT = 2
 
     def __init__(self, link_uri):
         """ Initialize and run the motion with the specified link_uri """
@@ -39,15 +38,10 @@ class BasicFlip:
         """This callback is called form the Crazyflie API when a Crazyflie
         has been connected and the TOCs have been downloaded."""
         print("Connected to %s" % link_uri)
-        print("Start _basic_up_motors!")
         self._basic_up_motors(self.DIST_UP, self.VELOCITY_UP)
-        print("Start _flip_motors!")
         self._flip_motors()
-        # print("Start land!")
-        # self.land(self.VELOCITY_LAND)
+        self.land(self.VELOCITY_LAND)
         print("Start disconnect!")
-        # t = Timer(self.TIME_DISCONNECT, self._cf.close_link)
-        # t.start()
         self._cf.close_link()
 
     def _disconnected(self, link_uri):
@@ -65,12 +59,13 @@ class BasicFlip:
         print("Connection to %s lost: %s" % (link_uri, msg))
 
     def _basic_up_motors(self, dist_up, vel_up):
-        print("Start take_off!")
+        print("Start _basic_up_motors!")
         self.take_off(dist_up, vel_up)
         print("remain up")
         time.sleep(self.TIME_HOVER_UP)
 
     def take_off(self, dist_up, vel_up):
+        print("Start take_off!")
         if self._is_flying:
             raise Exception('Already flying')
         if not self._cf.is_connected():
@@ -85,25 +80,18 @@ class BasicFlip:
     def up(self, dist_up, vel_up):
         self.move_distance(0.0, 0.0, dist_up, vel_up)
 
+    def land(self, velocity_land):
+        print("Start land!")
+        if self._is_flying:
+            # self.down(self._thread.get_height(), velocity_land)
+            self.down(self.DIST_UP, velocity_land)
+            self._thread.stop()
+            self._thread = None
+            self._cf.commander.send_stop_setpoint()
+            self._is_flying = False
+
     def down(self, dist_down, vel_down):
         self.move_distance(0.0, 0.0, -1*dist_down, vel_down)
-
-    def land(self, vel_land):
-        self.start_down(vel_land)
-        self._thread.stop()
-        self._thread = None
-        self._cf.commander.send_stop_setpoint()
-        self._is_flying = False
-
-    def start_down(self, velocity):
-        """
-        Start moving down. This function returns immediately.
-
-        :param velocity: The velocity of the motion (meters/second)
-        :return:
-        """
-        self.start_linear_motion(0.0, 0.0, -velocity)
-        time.sleep(1)
 
     def move_distance(self, distance_x_m, distance_y_m, distance_z_m,
                       velocity_m):
@@ -127,16 +115,9 @@ class BasicFlip:
     def start_linear_motion(self, velocity_x_m, velocity_y_m, velocity_z_m, rate_yaw=0.0):
         """
         Start a linear motion with an optional yaw rate input. This function returns immediately.
-
         positive X is forward
         positive Y is left
         positive Z is up
-
-        :param velocity_x_m: The velocity along the X-axis (meters/second)
-        :param velocity_y_m: The velocity along the Y-axis (meters/second)
-        :param velocity_z_m: The velocity along the Z-axis (meters/second)
-        :param rate_yaw: The angular rate (degrees/second)
-        :return:
         """
         self._set_vel_setpoint(
             velocity_x_m, velocity_y_m, velocity_z_m, rate_yaw)
@@ -158,18 +139,23 @@ class BasicFlip:
         time.sleep(2)
 
     def _flip_motors(self):
+        print("Start _flip_motors!")
         # 0 - 65535
-        thrust = 30000
-        pitch = 0
         roll = 0
+        pitch = 0
         yawrate = 0
+        thrust = 40000
         # Big jump before flip
         self._cf.commander.send_setpoint(0, 0, 0, 0)
-        for x in range(100):
+        for x in range(10):
             self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
             time.sleep(0.01)
-        # thrust = 2000
-        # self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
+        # roll
+        roll = 500
+        thrust = 0.17
+        for x in range(1):
+            self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
+            time.sleep(0.01)
         self._cf.commander.send_setpoint(0, 0, 0, 0)
 
 
