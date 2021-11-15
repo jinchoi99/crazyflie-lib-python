@@ -78,7 +78,7 @@ class BasicFlipThrust:
         roll = 0
         pitch = 500
         yawrate = 0
-        thrust = 0.17
+        thrust = 1
         for x in range(1):
             self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
             time.sleep(0.01)
@@ -91,7 +91,7 @@ class BasicFlipThrust:
         roll = 500
         pitch = 0
         yawrate = 0
-        thrust = 0.17
+        thrust = 1
         for x in range(1):
             self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
             time.sleep(0.01)
