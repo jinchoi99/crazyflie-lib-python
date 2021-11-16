@@ -14,6 +14,7 @@ from set_point_thread import SetPointThread
 class BasicSlant:
     # Distance (m)
     DIST_UP = 0.5
+    DIST_LAND = 0.2
     # Velocity (m/s)
     VELOCITY_UP = 0.2
     VELOCITY_LAND = 0.07
@@ -39,7 +40,7 @@ class BasicSlant:
         print("Connected to %s" % link_uri)
         self._basic_up_motors(self.DIST_UP, self.VELOCITY_UP)
         self._flip_motors()
-        # self.up(0.1, 0.2)
+        # self.up(0.2, 0.2)
         # self.land(self.VELOCITY_LAND)
         print("Start disconnect!")
         self._cf.close_link()
@@ -97,7 +98,7 @@ class BasicSlant:
         print("Start land!")
         if self._is_flying:
             # self.down(self._thread.get_height(), velocity_land)
-            self.down(self.DIST_UP, velocity_land)
+            self.down(self.DIST_LAND, velocity_land)
             self._thread.stop()
             self._thread = None
             self._cf.commander.send_stop_setpoint()
@@ -161,13 +162,11 @@ class BasicSlant:
         time.sleep(0.1)
         self._cf.commander.send_setpoint(0, 0, 0, 65535)
         time.sleep(0.1)
-        self._cf.commander.send_setpoint(0, 0, 0, 65535)
-        time.sleep(0.1)
-        self._cf.commander.send_setpoint(0, 0, 0, 65535)
-        time.sleep(0.1)
 
-        self._cf.commander.send_setpoint(360, 0, 0, 65535)
-        time.sleep(0.4)
+        self._cf.commander.send_setpoint(500, 0, 0, 65535)
+        time.sleep(0.3)
+        self._cf.commander.send_setpoint(500, 0, 0, 10000)
+        time.sleep(0.1)
 
         self._cf.commander.send_setpoint(0, 0, 0, 0)
 
