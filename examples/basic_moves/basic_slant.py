@@ -153,6 +153,7 @@ class BasicSlant:
         time.sleep(2)
 
     def _flip_motors(self):
+        # have to totally end hover set point? smt messes up the setpoint
         print("Start _flip_motors!")
         # 0 - 65535
         self._cf.commander.send_setpoint(0, 0, 0, 0)
