@@ -123,7 +123,7 @@ class Commander():
         vx and vy are in m/s
         yawrate is in degrees/s
         """
-        print(f'zdistance: {zdistance}')
+        # print(f'zdistance: {zdistance}')
         pk = CRTPPacket()
         pk.port = CRTPPort.COMMANDER_GENERIC
         pk.data = struct.pack('<Bffff', TYPE_HOVER,
