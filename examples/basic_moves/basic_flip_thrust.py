@@ -88,13 +88,10 @@ class BasicFlipThrust:
     def _basic_roll_motors(self):
         # roll to 500, pitch to 0 and raw thrust input to something very low (I used 0.17).
         # Now just hit the throttle to get upwards speed, hold the flip button shortly and watch it spin.
-        roll = 500
-        pitch = 0
-        yawrate = 0
-        thrust = 1
-        for x in range(1):
-            self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
-            time.sleep(0.1)
+        self._cf.commander.send_setpoint(0, 0, 0, 0)
+        self._cf.commander.send_setpoint(360, 0, 0, 10000)
+        time.sleep(0.2)
+        self._cf.commander.send_setpoint(0, 0, 0, 0)
         print("landing!")
         self._basic_land_motors()
 
