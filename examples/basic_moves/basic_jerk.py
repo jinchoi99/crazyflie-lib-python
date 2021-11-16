@@ -1,6 +1,5 @@
 """
-Simple example that connects to the first Crazyflie found,
-moves it up, flip, down
+Simple jerk
 """
 import time
 import math
@@ -39,12 +38,7 @@ class BasicFlip:
         has been connected and the TOCs have been downloaded."""
         print("Connected to %s" % link_uri)
         self._basic_up_motors(self.DIST_UP, self.VELOCITY_UP)
-
         self._flip_motors()
-        print("up!")
-        self.up(0.5, self.VELOCITY_UP)
-        # time.sleep(self.TIME_HOVER_UP)
-        self._basic_land_motors()
         self.land(self.VELOCITY_LAND)
         print("Start disconnect!")
         self._cf.close_link()
@@ -95,15 +89,14 @@ class BasicFlip:
         self.up(dist_up, vel_up)
 
     def up(self, dist_up, vel_up):
+        print("up!")
         self.move_distance(0.0, 0.0, dist_up, vel_up)
 
     def land(self, velocity_land):
         print("Start land!")
         if self._is_flying:
             # self.down(self._thread.get_height(), velocity_land)
-            # self.down(self.DIST_UP, velocity_land)
-            # self.stop()
-            # time.sleep(self.TIME_HOVER_UP)
+            self.down(self.DIST_UP, velocity_land)
             self._thread.stop()
             self._thread = None
             self._cf.commander.send_stop_setpoint()
@@ -164,30 +157,28 @@ class BasicFlip:
         pitch = 0
         yawrate = 0
         thrust = 40000
-        # Big jump before flip
+        # # Big jump before flip
         self._cf.commander.send_setpoint(0, 0, 0, 0)
-        for x in range(10):
-            self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
-            time.sleep(0.01)
+        # for x in range(10):
+        #     self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
+        #     time.sleep(0.01)
         # roll
-        roll = 5000
-        thrust = 40000
+        roll = 0
+        thrust = 65535
         for x in range(1):
             self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
             time.sleep(0.1)
-        # thrust = 100
-        # for x in range(1):
-        #     self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
-        #     time.sleep(0.1)
-        # roll = 0
-        # thrust = 1000
-        # for x in range(10):
-        #     self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
-        #     time.sleep(0.01)
-        # thrust = 40000
-        # for x in range(10):
-        #     self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
-        #     time.sleep(0.01)
+        roll = -500
+        thrust = 65535
+        for x in range(1):
+            self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
+            time.sleep(0.1)
+        roll = 500
+        thrust = 65535
+        for x in range(1):
+            self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
+            time.sleep(0.1)
+
         self._cf.commander.send_setpoint(0, 0, 0, 0)
 
 
