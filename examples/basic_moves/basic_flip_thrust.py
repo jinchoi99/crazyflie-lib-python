@@ -94,7 +94,7 @@ class BasicFlipThrust:
         thrust = 1
         for x in range(1):
             self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
-            time.sleep(0.01)
+            time.sleep(0.1)
         print("landing!")
         self._basic_land_motors()
 

@@ -11,7 +11,7 @@ from cflib.crazyflie import Crazyflie
 from set_point_thread import SetPointThread
 
 
-class BasicFlip:
+class BasicSlant:
     # Distance (m)
     DIST_UP = 0.5
     # Velocity (m/s)
@@ -39,7 +39,8 @@ class BasicFlip:
         print("Connected to %s" % link_uri)
         self._basic_up_motors(self.DIST_UP, self.VELOCITY_UP)
         self._flip_motors()
-        self.land(self.VELOCITY_LAND)
+        # self.up(0.1, 0.2)
+        # self.land(self.VELOCITY_LAND)
         print("Start disconnect!")
         self._cf.close_link()
 
@@ -153,25 +154,21 @@ class BasicFlip:
     def _flip_motors(self):
         print("Start _flip_motors!")
         # 0 - 65535
-        roll = 0
-        pitch = 0
-        yawrate = 0
-        thrust = 40000
-        # # Big jump before flip
         self._cf.commander.send_setpoint(0, 0, 0, 0)
-        # for x in range(10):
-        #     self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
-        #     time.sleep(0.01)
-        # roll
-        roll = 0
-        thrust = 65535
-        for x in range(1):
-            self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
-            time.sleep(0.1)
-        roll = -500
-        thrust = 10000
-        self._cf.commander.send_setpoint(roll, pitch, yawrate, thrust)
+        self._cf.commander.send_setpoint(0, 0, 0, 65535)
         time.sleep(0.1)
+        self._cf.commander.send_setpoint(0, 0, 0, 65535)
+        time.sleep(0.1)
+        self._cf.commander.send_setpoint(0, 0, 0, 65535)
+        time.sleep(0.1)
+        self._cf.commander.send_setpoint(0, 0, 0, 65535)
+        time.sleep(0.1)
+        self._cf.commander.send_setpoint(0, 0, 0, 65535)
+        time.sleep(0.1)
+
+        self._cf.commander.send_setpoint(360, 0, 0, 65535)
+        time.sleep(0.4)
+
         self._cf.commander.send_setpoint(0, 0, 0, 0)
 
 
@@ -186,6 +183,6 @@ if __name__ == "__main__":
         print(i[0])
 
     if len(available) > 0:
-        le = BasicFlip(available[0][0])
+        le = BasicSlant(available[0][0])
     else:
         print("No Crazyflies found, cannot run example")
