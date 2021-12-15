@@ -11,7 +11,7 @@ uri = uri_helper.uri_from_env(default='radio://0/80/2M/E7E7E7E7E7')
 logging.basicConfig(level=logging.ERROR)
 
 
-class Jump:
+class Left:
     def __init__(self, link_uri):
         self._cf = Crazyflie(rw_cache='./cache')
         self._cf.connected.add_callback(self._connected)
@@ -52,15 +52,23 @@ class Jump:
         # vx, vy, yawrate, zdistance
         # self._cf.commander.send_hover_setpoint(0, 0, 0, 0)
         zdistance = 0.5
+        vx = 5
+        vy = 0
         # self._cf.commander.send_hover_setpoint(0, 0, 0, zdistance)
         # time.sleep(5)
-        while(zdistance > 0.2):
-            self._cf.commander.send_hover_setpoint(0, 0, 100, zdistance)
-            time.sleep(0.5)
-            zdistance -= 0.05
+        # while(zdistance > 0.2):
+        #     self._cf.commander.send_hover_setpoint(0, 0, 0, zdistance)
+        #     time.sleep(0.5)
+        # zdistance -= 0.05
+        for x in range(5):
+            self._cf.commander.send_hover_setpoint(0, 0, 0, zdistance)
+            time.sleep(0.1)
+        for x in range(5):
+            self._cf.commander.send_hover_setpoint(vx, vy, 0, zdistance)
+            time.sleep(0.1)
         zdistance = 0.5
         while(zdistance > 0.05):
-            self._cf.commander.send_hover_setpoint(0, 0, 100, zdistance)
+            self._cf.commander.send_hover_setpoint(0, 0, 0, zdistance)
             time.sleep(0.5)
             zdistance -= 0.05
         self._cf.close_link()
@@ -70,4 +78,4 @@ if __name__ == '__main__':
     # Initialize the low-level drivers
     cflib.crtp.init_drivers()
 
-    le = Jump(uri)
+    le = Left(uri)

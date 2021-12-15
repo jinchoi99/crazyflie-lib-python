@@ -55,12 +55,17 @@ class Jump:
         # self._cf.commander.send_hover_setpoint(0, 0, 0, zdistance)
         # time.sleep(5)
         while(zdistance > 0.2):
-            self._cf.commander.send_hover_setpoint(0, 0, 100, zdistance)
+            self._cf.commander.send_hover_setpoint(0, 0, 0, zdistance)
             time.sleep(0.5)
             zdistance -= 0.05
-        zdistance = 0.5
+        zdistance = 0.7
+        while(zdistance > 0.4):
+            self._cf.commander.send_hover_setpoint(0, 0, 0, zdistance)
+            time.sleep(0.5)
+            zdistance -= 0.05
+        zdistance = 1
         while(zdistance > 0.05):
-            self._cf.commander.send_hover_setpoint(0, 0, 100, zdistance)
+            self._cf.commander.send_hover_setpoint(0, 0, 0, zdistance)
             time.sleep(0.5)
             zdistance -= 0.05
         self._cf.close_link()
