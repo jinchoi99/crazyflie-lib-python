@@ -30,7 +30,8 @@ class Spin:
         # Start a separate thread to do the motor test.
         # Do not hijack the calling thread!
         # Thread(target=self._ramp_motors).start()
-        self._ramp_motors()
+        # self._spin_motors()
+        self._spin_motors2()
 
     def _connection_failed(self, link_uri, msg):
         """Callback when connection initial connection fails (i.e no Crazyflie
@@ -46,7 +47,7 @@ class Spin:
         """Callback when the Crazyflie is disconnected (called in all cases)"""
         print('Disconnected from %s' % link_uri)
 
-    def _ramp_motors(self):
+    def _spin_motors(self):
         # thrust: 0-65535
         # Unlock startup thrust protection
         # vx, vy, yawrate, zdistance
@@ -67,6 +68,40 @@ class Spin:
             thrust -= 500
             time.sleep(0.1)
         self._cf.commander.send_stop_setpoint()
+        self._cf.close_link()
+
+    def _spin_motors2(self):
+        # thrust: 0-65535
+        # Unlock startup thrust protection
+        # vx, vy, yawrate, zdistance
+        # self._cf.commander.send_hover_setpoint(0, 0, 0, 0)
+        zdistance = 0
+        yawrate = 500
+        thrust = 40000
+        # self._cf.commander.send_hover_setpoint(0, 0, 0, zdistance)
+        time.sleep(5)
+        for x in range(50):
+            self._cf.commander.send_hover_setpoint(0, 0, 0, zdistance)
+            time.sleep(0.1)
+            if(zdistance < 0.5):
+                zdistance += 0.05
+        for x in range(100):
+            self._cf.commander.send_hover_setpoint(0, 0, yawrate, zdistance)
+            time.sleep(0.1)
+            yawrate *= -1
+
+        while(zdistance > 0.1):
+            self._cf.commander.send_hover_setpoint(0, 0, 0, zdistance)
+            time.sleep(0.1)
+            zdistance -= 0.05
+        # self._cf.commander.send_hover_setpoint(0, 0, 0, 0)
+        # self._cf.commander.send_setpoint(0, 0, 0, 0)
+        # while(thrust > 29000):
+        #     self._cf.commander.send_setpoint(0, 0, yawrate, thrust)
+        #     thrust -= 500
+        #     yawrate *= -1
+        #     time.sleep(0.1)
+        # self._cf.commander.send_stop_setpoint()
         self._cf.close_link()
 
 # roll/pitch are in degree
