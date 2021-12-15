@@ -69,6 +69,10 @@ class Spin:
         self._cf.commander.send_stop_setpoint()
         self._cf.close_link()
 
+# roll/pitch are in degree
+# Yaw is in degree per seconds
+# thrust is from 0 to 65535 with 0 meaning 0% and 65535 meaning 100%
+
 
 if __name__ == '__main__':
     # Initialize the low-level drivers
