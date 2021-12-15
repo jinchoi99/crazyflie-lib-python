@@ -16,8 +16,8 @@ class BasicUp:
     # Distance (m)
     DIST_UP = 0.6
     # Velocity (m/s)
-    VELOCITY_UP = 10
-    VELOCITY_LAND = 0.01
+    VELOCITY_UP = 0.5
+    VELOCITY_LAND = 0.07
     # Time (sec)
     TIME_HOVER_UP = 2
     TIME_DISCONNECT = 1
