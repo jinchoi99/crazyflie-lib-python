@@ -92,6 +92,7 @@ class BasicFlipThrust:
         self._cf.commander.send_setpoint(360, 0, 0, 10000)
         time.sleep(0.2)
         self._cf.commander.send_setpoint(0, 0, 0, 0)
+        time.sleep(0.2)
         print("landing!")
         self._basic_land_motors()
 

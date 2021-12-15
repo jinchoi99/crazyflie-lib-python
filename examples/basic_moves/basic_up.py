@@ -14,10 +14,10 @@ from set_point_thread import SetPointThread
 
 class BasicUp:
     # Distance (m)
-    DIST_UP = 0.3
+    DIST_UP = 0.6
     # Velocity (m/s)
-    VELOCITY_UP = 0.2
-    VELOCITY_LAND = 0.07
+    VELOCITY_UP = 10
+    VELOCITY_LAND = 0.01
     # Time (sec)
     TIME_HOVER_UP = 2
     TIME_DISCONNECT = 1
