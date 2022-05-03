@@ -17,10 +17,8 @@
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-#  MA  02110-1301, USA.
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 This script shows the basic use of the PositionHlCommander class.
 
@@ -69,7 +67,11 @@ def slightly_more_complex_usage():
 
 def land_on_elevated_surface():
     with SyncCrazyflie(uri, cf=Crazyflie(rw_cache='./cache')) as scf:
-        with PositionHlCommander(scf, default_height=0.5, default_velocity=0.2, default_landing_height=0.35) as pc:
+        with PositionHlCommander(scf,
+                                 default_height=0.5,
+                                 default_velocity=0.2,
+                                 default_landing_height=0.35,
+                                 controller=PositionHlCommander.CONTROLLER_PID) as pc:
             # fly onto a landing platform at non-zero height (ex: from floor to desk, etc)
             pc.forward(1.0)
             pc.left(1.0)
@@ -78,7 +80,7 @@ def land_on_elevated_surface():
 
 def simple_sequence():
     with SyncCrazyflie(uri, cf=Crazyflie(rw_cache='./cache')) as scf:
-        with PositionHlCommander(scf) as pc:
+        with PositionHlCommander(scf, controller=PositionHlCommander.CONTROLLER_PID) as pc:
             pc.forward(1.0)
             pc.left(1.0)
             pc.back(1.0)

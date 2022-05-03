@@ -20,10 +20,8 @@
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-#  MA  02110-1301, USA.
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 Callback objects used in the Crazyflie library
 """
@@ -57,7 +55,7 @@ class Caller():
 
 
 class Syncer:
-    """A class to create syncronous behaviour for methods using callbacks"""
+    """A class to create synchronous behavior for methods using callbacks"""
 
     def __init__(self):
         self._event = Event()

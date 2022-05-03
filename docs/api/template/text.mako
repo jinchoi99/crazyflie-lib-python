@@ -2,18 +2,12 @@
 
 <%!
     def title(heading, name):
-        if name == 'cflib':
-            return 'The CFLib API reference'
-        else:
-            return name.split('.')[-1]
+        return name.split('.')[-1]
 %>
 
 <%!
     def page_id(name):
-        if name == 'cflib':
-            return 'api_reference'
-        else:
-            return name.replace('.', '-')
+        return name.replace('.', '-')
 %>
 
 <%!
@@ -36,7 +30,7 @@
 <%!
     import re
     def deflist(s):
-        param_re = r':param (.*):'
+        param_re = r':param (.*):|@param (\w+)'
         params_found = False
         in_param = False
         desc = str()
@@ -73,7 +67,12 @@
                     out += f'{desc} |' + '\n'
 
                 in_param = True
-                out += f'| {match.group(1)} | '
+
+                if match.group(1) is not None:
+                    out += f'| {match.group(1)} | '
+                else:
+                    out += f'| {match.group(2)} | '
+
                 desc = line.replace(match.group(0), '')
 
             elif in_param:

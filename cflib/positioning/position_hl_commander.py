@@ -17,10 +17,8 @@
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-#  MA  02110-1301, USA.
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 The PositionHlCommander is used to make it easy to write scripts that moves the
 Crazyflie around. Some sort of positioning support is required, for
@@ -52,17 +50,17 @@ class PositionHlCommander:
                  x=0.0, y=0.0, z=0.0,
                  default_velocity=0.5,
                  default_height=0.5,
-                 controller=CONTROLLER_PID,
+                 controller=None,
                  default_landing_height=0.0):
         """
         Construct an instance of a PositionHlCommander
 
-        :param crazyflie: a Crazyflie or SyncCrazyflie instance
+        :param crazyflie: A Crazyflie or SyncCrazyflie instance
         :param x: Initial position, x
         :param y: Initial position, y
         :param z: Initial position, z
-        :param default_velocity: the default velocity to use
-        :param default_height: the default height to fly at
+        :param default_velocity: The default velocity to use
+        :param default_height: The default height to fly at
         :param controller: Which underlying controller to use
         :param default_landing_height: Landing height (zero if not specified); for landing on objects off the ground
         """
@@ -95,9 +93,9 @@ class PositionHlCommander:
         Do not call this function if you use the with keyword. Take off is
         done automatically when the context is created.
 
-        :param height: the height (meters) to hover at. None uses the default
+        :param height: The height (meters) to hover at. None uses the default
                        height set when constructed.
-        :param velocity: the velocity (meters/second) when taking off
+        :param velocity: The velocity (meters/second) when taking off
         :return:
         """
         if self._is_flying:
@@ -152,8 +150,8 @@ class PositionHlCommander:
         """
         Go left
 
-        :param distance_m: the distance to travel (meters)
-        :param velocity: the velocity of the motion (meters/second)
+        :param distance_m: The distance to travel (meters)
+        :param velocity: The velocity of the motion (meters/second)
         :return:
         """
         self.move_distance(0.0, distance_m, 0.0, velocity)
@@ -162,8 +160,8 @@ class PositionHlCommander:
         """
         Go right
 
-        :param distance_m: the distance to travel (meters)
-        :param velocity: the velocity of the motion (meters/second)
+        :param distance_m: The distance to travel (meters)
+        :param velocity: The velocity of the motion (meters/second)
         :return:
         """
         self.move_distance(0.0, -distance_m, 0.0, velocity)
@@ -172,8 +170,8 @@ class PositionHlCommander:
         """
         Go forward
 
-        :param distance_m: the distance to travel (meters)
-        :param velocity: the velocity of the motion (meters/second)
+        :param distance_m: The distance to travel (meters)
+        :param velocity: The velocity of the motion (meters/second)
         :return:
         """
         self.move_distance(distance_m, 0.0, 0.0, velocity)
@@ -182,8 +180,8 @@ class PositionHlCommander:
         """
         Go backwards
 
-        :param distance_m: the distance to travel (meters)
-        :param velocity: the velocity of the motion (meters/second)
+        :param distance_m: The distance to travel (meters)
+        :param velocity: The velocity of the motion (meters/second)
         :return:
         """
         self.move_distance(-distance_m, 0.0, 0.0, velocity)
@@ -192,8 +190,8 @@ class PositionHlCommander:
         """
         Go up
 
-        :param distance_m: the distance to travel (meters)
-        :param velocity: the velocity of the motion (meters/second)
+        :param distance_m: The distance to travel (meters)
+        :param velocity: The velocity of the motion (meters/second)
         :return:
         """
         self.move_distance(0.0, 0.0, distance_m, velocity)
@@ -202,8 +200,8 @@ class PositionHlCommander:
         """
         Go down
 
-        :param distance_m: the distance to travel (meters)
-        :param velocity: the velocity of the motion (meters/second)
+        :param distance_m: The distance to travel (meters)
+        :param velocity: The velocity of the motion (meters/second)
         :return:
         """
         self.move_distance(0.0, 0.0, -distance_m, velocity)
@@ -219,7 +217,7 @@ class PositionHlCommander:
         :param distance_x_m: The distance to travel along the X-axis (meters)
         :param distance_y_m: The distance to travel along the Y-axis (meters)
         :param distance_z_m: The distance to travel along the Z-axis (meters)
-        :param velocity: the velocity of the motion (meters/second)
+        :param velocity: The velocity of the motion (meters/second)
         :return:
         """
 
@@ -236,7 +234,7 @@ class PositionHlCommander:
         :param x: X coordinate
         :param y: Y coordinate
         :param z: Z coordinate
-        :param velocity: the velocity (meters/second)
+        :param velocity: The velocity (meters/second)
         :return:
         """
 
@@ -284,8 +282,9 @@ class PositionHlCommander:
         self._cf.param.set_value('commander.enHighLevel', '1')
 
     def _activate_controller(self):
-        value = str(self._controller)
-        self._cf.param.set_value('stabilizer.controller', value)
+        if self._controller is not None:
+            value = str(self._controller)
+            self._cf.param.set_value('stabilizer.controller', value)
 
     def _velocity(self, velocity):
         if velocity is self.DEFAULT:

@@ -19,10 +19,8 @@
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-#  MA  02110-1301, USA.
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 Simple example that connects to the first Crazyflie found, looks for
 EEPROM memories and lists its contents.
@@ -124,9 +122,6 @@ class EEPROMExample:
 
 
 if __name__ == '__main__':
-    print('This example will not work with the BLE version of the nRF51'
-          ' firmware (flashed on production units). See https://github.com'
-          '/bitcraze/crazyflie-clients-python/issues/166')
     # Initialize the low-level drivers
     cflib.crtp.init_drivers()
 

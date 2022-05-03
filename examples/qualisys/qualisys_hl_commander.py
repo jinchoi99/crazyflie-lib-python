@@ -105,8 +105,7 @@ class QtmWrapper(Thread):
 
         params = await self.connection.get_parameters(parameters=['6d'])
         xml = ET.fromstring(params)
-        self.qtm_6DoF_labels = [label.text for label in xml.iter('Name')]
-        print(self.qtm_6DoF_labels)
+        self.qtm_6DoF_labels = [label.text.strip() for index, label in enumerate(xml.findall('*/Body/Name'))]
 
         await self.connection.stream_frames(
             components=['6D'],
@@ -272,12 +271,11 @@ def upload_trajectory(cf, trajectory_id, trajectory):
         y = Poly4D.Poly(row[9:17])
         z = Poly4D.Poly(row[17:25])
         yaw = Poly4D.Poly(row[25:33])
-        trajectory_mem.poly4Ds.append(Poly4D(duration, x, y, z, yaw))
+        trajectory_mem.trajectory.append(Poly4D(duration, x, y, z, yaw))
         total_duration += duration
 
     Uploader().upload(trajectory_mem)
-    cf.high_level_commander.define_trajectory(trajectory_id, 0,
-                                              len(trajectory_mem.poly4Ds))
+    cf.high_level_commander.define_trajectory(trajectory_id, 0, len(trajectory_mem.trajectory))
     return total_duration
 
 

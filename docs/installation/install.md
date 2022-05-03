@@ -3,6 +3,10 @@ title: Installation
 page_id: install
 ---
 
+## Requirements
+
+This project requires Python 3.7+.
+See below sections for more platform-specific requirements.
 ## Development
 ### Developing for the cflib
 * [Fork the cflib](https://help.github.com/articles/fork-a-repo/)
@@ -12,7 +16,7 @@ page_id: install
 
 * [Uninstall the cflib if you don't want it any more](http://pip-python3.readthedocs.org/en/latest/reference/pip_uninstall.html), `pip uninstall cflib`
 
-Note: If you are developing for the cflib you must use python3. On Ubuntu (16.04, 18.08) use `pip3` instead of `pip`.
+Note: If you are developing for the cflib you must use python3. On Ubuntu (20.04+) use `pip3` instead of `pip`.
 
 ### Linux, OSX, Windows
 
@@ -49,7 +53,7 @@ This will run the lint checkers defined in `.pre-commit-config-yaml` on your pro
 ### With docker and the toolbelt
 
 For information and installation of the
-[toolbelt.](https://wiki.bitcraze.io/projects:dockerbuilderimage:index)
+[toolbelt.](https://github.com/bitcraze/toolbelt)
 
 * Check to see if you pass tests: `tb test`
 * Check to see if you pass style guidelines: `tb verify`

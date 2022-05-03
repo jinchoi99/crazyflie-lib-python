@@ -17,10 +17,8 @@
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-#  MA  02110-1301, USA.
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 This script implements a simple matrix light printer to be used with a
 camera with open shutter in a dark room.
@@ -112,5 +110,5 @@ if __name__ == '__main__':
     image_def = ImageDef('monalisa.png')
 
     with SyncCrazyflie(uri, cf=Crazyflie(rw_cache='./cache')) as scf:
-        with PositionHlCommander(scf, default_height=0.5) as pc:
+        with PositionHlCommander(scf, default_height=0.5, controller=PositionHlCommander.CONTROLLER_PID) as pc:
             matrix_print(scf.cf, pc, image_def)

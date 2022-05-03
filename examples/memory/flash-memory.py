@@ -11,10 +11,8 @@
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-#  MA  02110-1301, USA.
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 Flash the DS28E05 EEPROM via CRTP.
 """
@@ -133,14 +131,6 @@ def choose(items, title_text, question_text):
 
 
 if __name__ == '__main__':
-    # Show info about bug 166
-    print('\n###\n'
-          'Please make sure that your NRF firmware is compiled without\n'
-          'BLE support for this to work.\n'
-          'See '
-          'https://github.com/bitcraze/crazyflie-clients-python/issues/166\n'
-          '###\n')
-
     # Initialize the low-level drivers
     cflib.crtp.init_drivers()
 

@@ -17,10 +17,8 @@
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-#  MA  02110-1301, USA.
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 Simple example that connects to one crazyflie (check the address at the top
 and update it to your crazyflie address) and uses the high level commander
@@ -157,15 +155,14 @@ def upload_trajectory(cf, trajectory_id, trajectory):
         y = Poly4D.Poly(row[9:17])
         z = Poly4D.Poly(row[17:25])
         yaw = Poly4D.Poly(row[25:33])
-        trajectory_mem.poly4Ds.append(Poly4D(duration, x, y, z, yaw))
+        trajectory_mem.trajectory.append(Poly4D(duration, x, y, z, yaw))
         total_duration += duration
 
     upload_result = Uploader().upload(trajectory_mem)
     if not upload_result:
         print('Upload failed, aborting!')
         sys.exit(1)
-    cf.high_level_commander.define_trajectory(trajectory_id, 0,
-                                              len(trajectory_mem.poly4Ds))
+    cf.high_level_commander.define_trajectory(trajectory_id, 0, len(trajectory_mem.trajectory))
     return total_duration
 
 

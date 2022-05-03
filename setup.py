@@ -9,7 +9,7 @@ long_description = (directory / 'README.md').read_text()
 
 setup(
     name='cflib',
-    version='0.1.16',
+    version='0.1.18.1',
     packages=find_packages(exclude=['examples', 'tests']),
 
     description='Crazyflie python driver',
@@ -34,7 +34,10 @@ setup(
 
     install_requires=[
         'pyusb>=1.0.0b2',
-        'opencv-python-headless==4.5.1.48'
+        'libusb-package~=1.0',
+        'scipy~=1.7',
+        'numpy>=1.20,<1.25',
+        'opencv-python-headless~=4.5.5',
     ],
 
     # $ pip install -e .[dev]

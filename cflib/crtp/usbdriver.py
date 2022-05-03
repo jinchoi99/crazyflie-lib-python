@@ -20,10 +20,8 @@
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-#  MA  02110-1301, USA.
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 Crazyflie USB driver.
 
@@ -72,16 +70,15 @@ class UsbDriver(CRTPDriver):
         """
 
         # check if the URI is a radio URI
-        if not re.search('^usb://', uri):
+        uri_data = re.search('^usb://([0-9]+)$',
+                             uri)
+        if not uri_data:
             raise WrongUriType('Not a radio URI')
 
         # Open the USB dongle
         if not re.search('^usb://([0-9]+)$',
                          uri):
             raise WrongUriType('Wrong radio URI format!')
-
-        uri_data = re.search('^usb://([0-9]+)$',
-                             uri)
 
         self.uri = uri
 

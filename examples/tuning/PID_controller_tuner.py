@@ -20,10 +20,8 @@
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-#  MA  02110-1301, USA.
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 Gui une the PID controller of the crazyflie
 
@@ -154,7 +152,10 @@ class TunerControlCF:
         self.cf.param.add_update_callback(
             group='posCtlPid', name='zKd', cb=self.param_updated_callback_Kd)
         self.cf.param.add_update_callback(
-            group='posCtlPid', name='xyVelMax',
+            group='posCtlPid', name='xVelMax',
+            cb=self.param_updated_callback_vMax)
+        self.cf.param.add_update_callback(
+            group='posCtlPid', name='yVelMax',
             cb=self.param_updated_callback_vMax)
 
         self.current_value_kp = 0
@@ -165,7 +166,8 @@ class TunerControlCF:
         self.cf.param.request_param_update('posCtlPid.zKp')
         self.cf.param.request_param_update('posCtlPid.zKi')
         self.cf.param.request_param_update('posCtlPid.zKd')
-        self.cf.param.request_param_update('posCtlPid.xyVelMax')
+        self.cf.param.request_param_update('posCtlPid.xVelMax')
+        self.cf.param.request_param_update('posCtlPid.yVelMax')
 
         time.sleep(0.1)
 
@@ -196,7 +198,8 @@ class TunerControlCF:
                            'Ki', self.pid_gui.scale_Ki.get())
         cf.param.set_value(self.unit_choice+'CtlPid.'+self.axis_choice +
                            'Kd', self.pid_gui.scale_Kd.get())
-        cf.param.set_value('posCtlPid.xyVelMax', self.pid_gui.scale_vMax.get())
+        cf.param.set_value('posCtlPid.xVelMax', self.pid_gui.scale_vMax.get())
+        cf.param.set_value('posCtlPid.yVelMax', self.pid_gui.scale_vMax.get())
 
         time.sleep(0.1)
 

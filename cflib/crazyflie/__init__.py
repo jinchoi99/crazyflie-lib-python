@@ -20,10 +20,8 @@
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#  You should have received a copy of the GNU General Public License
-#  along with this program; if not, write to the Free Software
-#  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-#  MA  02110-1301, USA.
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
 """
 The Crazyflie module is used to easily connect/send/receive data
 from a Crazyflie.
@@ -75,8 +73,8 @@ class Crazyflie():
         """
         Create the objects from this module and register callbacks.
 
-        ro_cache -- Path to read-only cache (string)
-        rw_cache -- Path to read-write cache (string)
+        @param ro_cache Path to read-only cache (string)
+        @param rw_cache Path to read-write cache (string)
         """
 
         # Called on disconnect, no matter the reason
@@ -308,9 +306,9 @@ class Crazyflie():
         """
         Send a packet through the link interface.
 
-        pk -- Packet to send
-        expect_answer -- True if a packet from the Crazyflie is expected to
-                         be sent back, otherwise false
+        @param pk Packet to send
+        @param expect_answer True if a packet from the Crazyflie is expected to
+                             be sent back, otherwise false
 
         """
 
